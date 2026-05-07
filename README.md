@@ -70,7 +70,7 @@ northstar-bank-alg/
 ├── 02_audience_lead_selection.sas      # Eligibility waterfall, anti-join suppression, dedup
 ├── 03_data_quality_control.sas         # QC suite: critical/warning checks, %ABORT CANCEL
 ├── 04_channel_assignment.sas           # Propensity scoring, exclusive channel logic, vendor files
-├── 05_lead_attribution_analysis.sas    # Response match, lead-to-revenue, lift table, CPA/ROI
+├── 05_campaign_delivery_reconciliation.sas  # Count reconciliation, channel file verification, Workfront log
 │
 ├── data/                               # Synthetic CRM + core banking data (auto-generated)
 ├── output/                             # Channel delivery files (EMAIL, CALL, MAIL)
@@ -90,7 +90,7 @@ northstar-bank-alg/
 | PROC FREQ / MEANS | Data profiling, QC distributions, response rate reporting |
 | Parameterized macros | `%CRITICAL_CHECK`, `%WARN_CHECK`, `%PROFILE_TABLE`, `%CHECK_MISSING` |
 | `%ABORT CANCEL` | Hard stop on critical QC failure — files cannot deploy |
-| PROC EXPORT / ODS | QC reports, channel delivery files, lift tables |
+| PROC EXPORT / ODS | QC reports, channel delivery files, delivery reconciliation summary |
 
 ### Cloud-Ready Patterns — Azure / Databricks Migration Path
 
@@ -122,13 +122,13 @@ Each program includes explicit **Cloud Migration Notes** mapping SAS constructs 
   │                                                                   │
   │  01 Discovery ──► 02 Audience/Lead Select ──► 03 QC Suite        │
   │                                                    │              │
-  │  05 Attribution ◄── 04 Channel Assignment ◄────────┘              │
+  │  05 Delivery Recon ◄── 04 Channel Assignment ◄─────┘              │
   └─────────────────────────┬───────────────────────────────────────┘
-                             │  Conversion data · lift · CPA
+                             │  Count confirmation · Workfront log
                              ▼
   ┌─────────────────────────────────────────────────────────────────┐
-  │              REPORTING & OPTIMIZATION LAYER                       │
-  │  A&LG Performance Dashboard  ·  Model recalibration feedback     │
+  │              CAMPAIGN TRACKING LAYER                              │
+  │  Adobe Workfront campaign close  ·  Delivery confirmation memo   │
   └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -178,6 +178,6 @@ detail-oriented research that A&LG needs. That's the job.*
 
 ## About This Portfolio
 
-Built to demonstrate A&LG-aligned campaign analytics expertise: multi-source audience data integration, SBO signal confidence hierarchy, lead lifecycle management from selection through closed-loop attribution, and a migration-ready SAS codebase with Azure/Databricks equivalents throughout. Reflects the operational SAS execution layer that sits beneath modern AI-powered audience strategy.
+Built to demonstrate A&LG-aligned campaign execution expertise: multi-source audience data integration, SBO signal confidence hierarchy, lead selection waterfall, QC discipline with zero-tolerance suppression checks, multi-channel file delivery, and post-deployment reconciliation. The focus is clean, accurate, on-time campaign execution — the operational SAS layer that activates audience strategy into deployable lead files.
 
 *North Star Bank is a fictional entity created for portfolio demonstration purposes only.*
