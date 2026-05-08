@@ -1,8 +1,9 @@
 <p align="center">
   <img src="assets/northstar_campaign_engine_logo.png" alt="Northstar Campaign Engine" width="260"/>
 </p>
-> *"Navigate by the brightest signal in the data."*
-
+<p align="center">
+  <strong>Navigate by the brightest signal in the data.</strong>
+</p>
 ---
 
 # North Star Bank — Audience & Lead Generation (A&LG)
