@@ -30,7 +30,7 @@
 
 options mprint mlogic symbolgen;
 
-%let base_path   = /home/claude/northstar-v3/github;
+%let base_path   = /home/u1557222/northstar_campaign_engine;
 %let data_path   = &base_path./northstar-bank-alg/data;
 %let output_path = &base_path./northstar-bank-alg/output;
 %let campaign_id = NS_ALG_BIZ_XSELL_2024Q3;

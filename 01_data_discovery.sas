@@ -33,7 +33,7 @@
 options mprint mlogic symbolgen;
 
 /* ── CAMPAIGN PARAMETERS ─────────────────────────────────────────────── */
-%let base_path    = /home/claude/northstar-v3/github;
+%let base_path    = /home/u1557222/northstar_campaign_engine;
 %let data_path    = &base_path./northstar-bank-alg/data;
 %let campaign_id  = NS_ALG_BIZ_XSELL_2024Q3;
 %let run_date     = %sysfunc(today(), yymmddn8.);
