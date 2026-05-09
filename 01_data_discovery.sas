@@ -191,16 +191,16 @@ run;
     select count(&keycol.)          into :n_key      from &lib..&tbl.;
     select count(distinct &keycol.) into :n_distinct from &lib..&tbl.;
   quit;
-  %put NOTE: [A&&LG PROFILE] &lib..&tbl. | ROWS=%trim(&n_rows.) | KEY_NONMISS=%trim(&n_key.) | DISTINCT=%trim(&n_distinct.);
+  %put NOTE: %nrstr([A&LG PROFILE]) &lib..&tbl. | ROWS=%trim(&n_rows.) | KEY_NONMISS=%trim(&n_key.) | DISTINCT=%trim(&n_distinct.);
 %mend profile_table;
-
+options nomlogic nosymbolgen nomprint;
 %profile_table(lib=alg, tbl=crm_customers,      keycol=customer_id);
 %profile_table(lib=alg, tbl=core_biz_accounts,  keycol=customer_id);
 %profile_table(lib=alg, tbl=sbo_enrichment,     keycol=customer_id);
 %profile_table(lib=alg, tbl=aep_audience_export,keycol=customer_id);
 %profile_table(lib=alg, tbl=alg_suppressions,   keycol=customer_id);
 %profile_table(lib=alg, tbl=recent_contacts,     keycol=customer_id);
-
+options mlogic symbolgen mprint;
 
 /* ── STEP 3: SBO SIGNAL COVERAGE AUDIT ───────────────────────────────── */
 
