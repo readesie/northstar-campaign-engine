@@ -30,6 +30,7 @@
     Results → Delta audit table in Azure Data Lake
 ==========================================================================*/
 
+dm 'log;clear;output;clear;';
 options mprint mlogic symbolgen;
 
 /* ── CAMPAIGN PARAMETERS ─────────────────────────────────────────────── */
