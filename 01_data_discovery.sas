@@ -191,7 +191,7 @@ run;
     select count(&keycol.)          into :n_key      from &lib..&tbl.;
     select count(distinct &keycol.) into :n_distinct from &lib..&tbl.;
   quit;
-  %put NOTE: [A&LG PROFILE] &lib..&tbl. | ROWS=%trim(&n_rows.) | KEY_NONMISS=%trim(&n_key.) | DISTINCT=%trim(&n_distinct.);
+  %put NOTE: [A&&LG PROFILE] &lib..&tbl. | ROWS=%trim(&n_rows.) | KEY_NONMISS=%trim(&n_key.) | DISTINCT=%trim(&n_distinct.);
 %mend profile_table;
 
 %profile_table(lib=alg, tbl=crm_customers,      keycol=customer_id);
