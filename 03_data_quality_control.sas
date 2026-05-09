@@ -195,7 +195,7 @@ run;
 title;
 
 %put NOTE: ══════════════════════════════════════════════════════;
-%put NOTE:  A&LG QC SUMMARY — &campaign_id.;
+%put NOTE:  %nrstr(A&LG) QC SUMMARY — &campaign_id.;
 %put NOTE:  Universe      : &universe_n. records;
 %put NOTE:  All CRITICAL checks: PASS;
 %put NOTE:  AEP Coverage  : %sysfunc(putn(&aep_cov., percent8.1));

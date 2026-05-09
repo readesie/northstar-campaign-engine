@@ -158,7 +158,7 @@ proc print data=work.delivery_summary noobs label;
         records_expected      = "Expected"
         reconciliation_status = "Status"
         output_filename       = "Output File";
-  title "A&LG Campaign Delivery Reconciliation — &campaign_id.";
+  title "%nrstr(A&LG) Campaign Delivery Reconciliation — &campaign_id.";
   title2 "Deliver to: &campaign_owner. | Prepared by: &delivery_analyst.";
 run;
 
@@ -188,7 +188,7 @@ run;
 proc print data=work.campaign_log_entry noobs label;
   label campaign_id           = "Campaign"
         delivery_dt           = "Delivery Date"
-        alg_stage             = "A&LG Stage"
+        alg_stage             = "%nrstr(A&LG) Stage"
         email_n               = "Email"
         call_n                = "Call"
         mail_n                = "Mail"
@@ -202,7 +202,7 @@ title; title2;
 
 /* ── STEP 6: DELIVERY CONFIRMATION BANNER ────────────────────────────── */
 %put NOTE: ══════════════════════════════════════════════════════════════;
-%put NOTE:  A&LG DELIVERY CONFIRMATION — &campaign_id.;
+%put NOTE:  %nrstr(A&LG) DELIVERY CONFIRMATION — &campaign_id.;
 %put NOTE:  Delivery Date : %sysfunc(today(), worddate.);
 %put NOTE:  EMAIL file    : &actual_email. records — CONFIRMED;
 %put NOTE:  CALL file     : &actual_call.  records — CONFIRMED;

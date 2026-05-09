@@ -145,7 +145,7 @@ data alg.lead_universe;
   audience_segment_id  = "&audience_seg.";
   selection_dt         = today();
   label
-    alg_stage           = "A&LG Lifecycle Stage"
+    alg_stage           = "%nrstr(A&LG) Lifecycle Stage"
     audience_segment_id = "Upstream Audience Segment ID"
     score_source        = "Propensity Score Source (AEP or Internal)";
 run;
@@ -176,10 +176,10 @@ quit;
 proc print data=work.alg_waterfall noobs label;
   var step records pct_prior;
   format pct_prior 8.1;
-  label step      = "A&LG Selection Stage"
+  label step      = "%nrstr(A&LG) Selection Stage"
         records   = "Lead Count"
         pct_prior = "% of Prior Stage";
-  title "NS_ALG_BIZ_XSELL_2024Q3 — A&LG Lead Selection Waterfall";
+  title "NS_ALG_BIZ_XSELL_2024Q3 — %nrstr(A&LG) Lead Selection Waterfall";
   title2 "Deliver to Business Banking Marketing for sign-off prior to QC";
 run;
 
@@ -198,5 +198,5 @@ run;
 title; title2;
 
 %put NOTE: *** 02_audience_lead_selection.sas COMPLETE ***;
-%put NOTE: *** Final A&LG lead universe: &n_s7. records ***;
+%put NOTE: *** Final %nrstr(A&LG) lead universe: &n_s7. records ***;
 %put NOTE: *** Proceed to 03_data_quality_control.sas ***;

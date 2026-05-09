@@ -88,13 +88,13 @@ data work.deployed;
   end;
 
   alg_stage = 'LEAD_DEPLOYED';
-  label channel        = "A&LG Deployment Channel"
+  label channel        = "%nrstr(A&LG) Deployment Channel"
         channel_reason = "Channel Assignment Rationale";
 run;
 
 proc freq data=work.deployed;
   tables channel / nocum;
-  title "A&LG Channel Assignment Distribution";
+  title "%nrstr(A&LG) Channel Assignment Distribution";
 run;
 
 /* Score source breakdown by channel */
@@ -192,8 +192,8 @@ proc sql;
 quit;
 
 proc print data=work.deploy_summary noobs label;
-  title "A&LG Deployment Summary — &campaign_id.";
-  title2 "Deliver to Business Banking Marketing + A&LG Lead Manager";
+  title "%nrstr(A&LG) Deployment Summary — &campaign_id.";
+  title2 "Deliver to Business Banking Marketing + %nrstr(A&LG) Lead Manager";
 run;
 
 title; title2;
