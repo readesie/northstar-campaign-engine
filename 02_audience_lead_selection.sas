@@ -41,6 +41,7 @@ libname alg "&data_path.";
 
 
 /* ── STAGE 1: BASE — AGE BAND ────────────────────────────────────────── */
+proc datasets lib=work nodetails nofs nolist; delete s1_age; quit;
 data work.s1_age;
   set alg.crm_customers;
   age = year(today()) - birth_year;
@@ -51,6 +52,7 @@ run;
 
 
 /* ── STAGE 2: REQUIRE SBO SIGNAL ────────────────────────────────────── */
+proc datasets lib=work nodetails nofs nolist; delete s2_sbo; quit;
 proc sql;
   create table work.s2_sbo as
     select c.*, s.sbo_signal_source, s.sbo_confidence, s.naics_code
@@ -64,6 +66,7 @@ quit;
 /* ── STAGE 3: EXCLUDE EXISTING BUSINESS ACCOUNT HOLDERS ─────────────── */
 /* Anti-join: keep only records with NO match in core banking biz table.
    CLOUD: df_s2.join(df_biz, 'customer_id', 'left_anti') */
+proc datasets lib=work nodetails nofs nolist; delete s3_no_biz; quit;
 proc sql;
   create table work.s3_no_biz as
     select c.*
@@ -76,6 +79,7 @@ quit;
 
 
 /* ── STAGE 4: APPLY SUPPRESSION FILE ────────────────────────────────── */
+proc datasets lib=work nodetails nofs nolist; delete s4_clean; quit;
 proc sql;
   create table work.s4_clean as
     select c.*
@@ -88,6 +92,7 @@ quit;
 
 
 /* ── STAGE 5: CONTACT LAG ENFORCEMENT ───────────────────────────────── */
+proc datasets lib=work nodetails nofs nolist; delete s5_lag; quit;
 proc sql;
   create table work.s5_lag as
     select c.*
@@ -101,6 +106,7 @@ quit;
 
 
 /* ── STAGE 6: DEDUPLICATION ─────────────────────────────────────────── */
+proc datasets lib=work nodetails nofs nolist; delete s6_dedup; quit;
 proc sort data=work.s5_lag out=work.s6_dedup nodupkey;
   by customer_id;
 run;
@@ -113,6 +119,7 @@ run;
    behavioral signal from real-time CDP that SAS source data lacks.
    CLOUD: This join runs natively in Databricks against a Delta table
    populated by the AEP Destinations connector. */
+proc datasets lib=work nodetails nofs nolist; delete s7_enriched; quit;
 proc sql;
   create table work.s7_enriched as
     select u.*,
