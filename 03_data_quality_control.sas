@@ -19,6 +19,7 @@
     %ABORT CANCEL → raise ValueError() in notebook job step.
 ==========================================================================*/
 
+dm 'log;clear;output;clear;';
 options mprint mlogic symbolgen;
 
 %let base_path      = /home/u1557222/northstar_campaign_engine;

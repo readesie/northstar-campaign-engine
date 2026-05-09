@@ -31,6 +31,7 @@
     Workfront update → Adobe Workfront REST API call from ADF pipeline
 ==========================================================================*/
 
+dm 'log;clear;output;clear;';
 options mprint mlogic symbolgen;
 
 /* ── CAMPAIGN PARAMETERS ─────────────────────────────────────────────── */

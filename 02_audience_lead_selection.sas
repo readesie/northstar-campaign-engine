@@ -26,7 +26,7 @@
   CLOUD NOTE: Anti-join pattern maps directly to Spark SQL.
   In PySpark: df_leads.join(df_suppress, 'customer_id', 'left_anti')
 ==========================================================================*/
-
+dm 'log;clear;output;clear;';
 options mprint mlogic symbolgen;
 
 %let base_path    = /home/u1557222/northstar_campaign_engine;
