@@ -37,6 +37,7 @@ options mprint mlogic symbolgen;
 %let min_age      = 35;
 %let max_age      = 60;
 
+libname alg clear;
 libname alg "&data_path.";
 
 

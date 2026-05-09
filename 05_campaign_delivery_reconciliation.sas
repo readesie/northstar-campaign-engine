@@ -43,6 +43,7 @@ options mprint mlogic symbolgen;
 %let campaign_owner   = Business Banking Marketing;
 %let delivery_analyst = A&LG Campaign Analytics;
 
+libname alg clear;
 libname alg "&data_path.";
 
 

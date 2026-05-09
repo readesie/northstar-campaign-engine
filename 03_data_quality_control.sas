@@ -29,6 +29,7 @@ options mprint mlogic symbolgen;
 %let expected_max   = 35000;
 %let missing_thresh = 0.05;
 
+libname alg clear;
 libname alg "&data_path.";
 
 

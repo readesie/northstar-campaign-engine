@@ -37,6 +37,7 @@ options mprint mlogic symbolgen;
 %let campaign_id = NS_ALG_BIZ_XSELL_2024Q3;
 %let run_date    = %sysfunc(today(), yymmddn8.);
 
+libname alg clear;
 libname alg "&data_path.";
 
 

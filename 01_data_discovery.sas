@@ -40,6 +40,7 @@ options mprint mlogic symbolgen;
 %let run_date     = %sysfunc(today(), yymmddn8.);
 %let audience_seg = SBO_BIZMISSING_35_60;  /* A&LG audience segment ID */
 
+libname alg clear;
 libname alg "&data_path.";
 
 /*
