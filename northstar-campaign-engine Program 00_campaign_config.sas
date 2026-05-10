@@ -11,4 +11,4 @@
 %let expected_max   = 35000;
 %let missing_thresh = 0.05;
 %let campaign_owner   = Business Banking Marketing;
-%let delivery_analyst = A&LG Campaign Analytics;
+%let delivery_analyst = %nrstr(A&LG) Campaign Analytics - KRS;
