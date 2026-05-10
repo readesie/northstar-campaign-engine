@@ -1,0 +1,14 @@
+%let base_path    = /home/u1557222/northstar_campaign_engine;
+%let data_path    = &base_path./northstar-bank-alg/data;
+%let output_path = &base_path./northstar-bank-alg/output;
+%let campaign_id  = NS_ALG_BIZ_XSELL_2024Q3;
+%let run_date     = %sysfunc(today(), yymmddn8.);
+%let audience_seg = SBO_BIZMISSING_35_60;  /* A&LG audience segment ID */
+%let contact_lag  = 30;
+%let min_age      = 35;
+%let max_age      = 60;
+%let expected_min   = 5000;
+%let expected_max   = 35000;
+%let missing_thresh = 0.05;
+%let campaign_owner   = Business Banking Marketing;
+%let delivery_analyst = A&LG Campaign Analytics;

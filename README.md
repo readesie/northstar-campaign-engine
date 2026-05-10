@@ -58,12 +58,12 @@ North Star Bank's A&LG team is activating a **small business owner (SBO) cross-s
 northstar-bank-alg/
 │
 ├── README.md
-│
-├── 01_data_discovery.sas               # Source profiling, SBO signal audit, coverage analysis
-├── 02_audience_lead_selection.sas      # Eligibility waterfall, anti-join suppression, dedup
-├── 03_data_quality_control.sas         # QC suite: critical/warning checks, %ABORT CANCEL
-├── 04_channel_assignment.sas           # Propensity scoring, exclusive channel logic, vendor files
-├── 05_campaign_delivery_reconciliation.sas  # Count reconciliation, channel file verification, Workfront log
+├── northstar-campaign-engine Program 00_campaign_config.sas                    # Campaign metadata
+├── northstar-campaign-engine Program 01_data_discovery.sas                     # Source profiling, SBO signal audit, coverage analysis
+├── northstar-campaign-engine Program 02_audience_lead_selection.sas            # Eligibility waterfall, anti-join suppression, dedup
+├── northstar-campaign-engine Program 03_data_quality_control.sas               # QC suite: critical/warning checks, %ABORT CANCEL
+├── northstar-campaign-engine Program 04_channel_assignment.sas                 # Propensity scoring, exclusive channel logic, vendor files
+├── northstar-campaign-engine Program 05_campaign_delivery_reconciliation.sas   # Count reconciliation, channel file verification, Workfront log
 │
 ├── data/                               # Synthetic CRM + core banking data (auto-generated)
 ├── output/                             # Channel delivery files (EMAIL, CALL, MAIL)

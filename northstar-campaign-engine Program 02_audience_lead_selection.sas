@@ -27,15 +27,10 @@
   In PySpark: df_leads.join(df_suppress, 'customer_id', 'left_anti')
 ==========================================================================*/
 dm 'log;clear;output;clear;';
-options mprint mlogic symbolgen;
+options mprint mlogic symbolgen source2;
 
-%let base_path    = /home/u1557222/northstar_campaign_engine;
-%let data_path    = &base_path./northstar-bank-alg/data;
-%let campaign_id  = NS_ALG_BIZ_XSELL_2024Q3;
-%let audience_seg = SBO_BIZMISSING_35_60;
-%let contact_lag  = 30;
-%let min_age      = 35;
-%let max_age      = 60;
+/* ── CAMPAIGN PARAMETERS ─────────────────────────────────────────────── */
+%include "&base_path./northstar-campaign-engine Program 00_campaign_config.sas";
 
 libname alg clear;
 libname alg "&data_path.";
@@ -48,7 +43,8 @@ data work.s1_age;
   age = year(today()) - birth_year;
   if &min_age. <= age <= &max_age.;
 run;
-%let n_s1 = %sysfunc(attrn(%sysfunc(open(work.s1_age)), nobs)); *for waterfall counts too later
+%let n_s0 = %sysfunc(attrn(%sysfunc(open(alg.crm_customers)), nobs)); *for waterfall counts too later;
+%let n_s1 = %sysfunc(attrn(%sysfunc(open(work.s1_age)), nobs)); *for waterfall counts too later;
 %put NOTE: [WATERFALL S1] Age &min_age.-&max_age. = &n_s1.;
 
 
@@ -60,7 +56,7 @@ proc sql;
       from work.s1_age c
       inner join alg.sbo_enrichment s on c.customer_id = s.customer_id;
 quit;
-%let n_s2 = %sysfunc(attrn(%sysfunc(open(work.s2_sbo)), nobs)); *for waterfall counts too later
+%let n_s2 = %sysfunc(attrn(%sysfunc(open(work.s2_sbo)), nobs)); *for waterfall counts too later;
 %put NOTE: [WATERFALL S2] + SBO signal = &n_s2.;
 
 
@@ -75,7 +71,7 @@ proc sql;
       left join alg.core_biz_accounts b on c.customer_id = b.customer_id
       where b.customer_id is null;
 quit;
-%let n_s3 = %sysfunc(attrn(%sysfunc(open(work.s3_no_biz)), nobs)); *for waterfall counts too later
+%let n_s3 = %sysfunc(attrn(%sysfunc(open(work.s3_no_biz)), nobs)); *for waterfall counts too later;
 %put NOTE: [WATERFALL S3] - Existing biz account = &n_s3.;
 
 
@@ -88,7 +84,7 @@ proc sql;
       left join alg.alg_suppressions s on c.customer_id = s.customer_id
       where s.customer_id is null;
 quit;
-%let n_s4 = %sysfunc(attrn(%sysfunc(open(work.s4_clean)), nobs)); *for waterfall counts too later
+%let n_s4 = %sysfunc(attrn(%sysfunc(open(work.s4_clean)), nobs)); *for waterfall counts too later;
 %put NOTE: [WATERFALL S4] - Suppressed = &n_s4.;
 
 
@@ -102,7 +98,7 @@ proc sql;
       where r.customer_id is null
          or r.last_contact_dt < (today() - &contact_lag.);
 quit;
-%let n_s5 = %sysfunc(attrn(%sysfunc(open(work.s5_lag)), nobs)); *for waterfall counts too later
+%let n_s5 = %sysfunc(attrn(%sysfunc(open(work.s5_lag)), nobs)); *for waterfall counts too later;
 %put NOTE: [WATERFALL S5] - Contact lag (&contact_lag.d) = &n_s5.;
 
 
@@ -111,7 +107,7 @@ proc datasets lib=work nodetails nofs nolist; delete s6_dedup; quit;
 proc sort data=work.s5_lag out=work.s6_dedup nodupkey;
   by customer_id;
 run;
-%let n_s6 = %sysfunc(attrn(%sysfunc(open(work.s6_dedup)), nobs)); *for waterfall counts too later
+%let n_s6 = %sysfunc(attrn(%sysfunc(open(work.s6_dedup)), nobs)); *for waterfall counts too later;
 %put NOTE: [WATERFALL S6] Dedup = &n_s6.;
 
 
@@ -131,7 +127,7 @@ proc sql;
       from work.s6_dedup u
       left join alg.aep_audience_export a on u.customer_id = a.customer_id;
 quit;
-%let n_s7 = %sysfunc(attrn(%sysfunc(open(work.s7_enriched)), nobs)); *for waterfall counts too later
+%let n_s7 = %sysfunc(attrn(%sysfunc(open(work.s7_enriched)), nobs)); *for waterfall counts too later;
 %put NOTE: [WATERFALL S7] AEP enrichment complete = &n_s7.;
 
 /* Count AEP coverage */
@@ -163,9 +159,9 @@ run;
 proc sql;
   create table work.alg_waterfall as
     select 1 as step_n, 'CRM base: all customers'                   as step length=60,
-           count(*) as records, . as pct_prior from alg.crm_customers
+           count(*) as records, count(*)/input("&n_s0.", best12.)*100 as pct_prior from alg.crm_customers
     union all select 2, 'S1: Age eligible (35-60)',
-      count(*), count(*)/input("&n_s1.", best12.)*100 from work.s1_age
+      count(*), count(*)/input("&n_s0.", best12.)*100 from work.s1_age
     union all select 3, 'S2: + SBO signal present (any source)',
       count(*), count(*)/input("&n_s1.", best12.)*100 from work.s2_sbo
     union all select 4, 'S3: - Existing business account holders',

@@ -29,13 +29,10 @@
 ==========================================================================*/
 
 dm 'log;clear;output;clear;';
-options mprint mlogic symbolgen;
+options mprint mlogic symbolgen source2;
 
-%let base_path   = /home/u1557222/northstar_campaign_engine;
-%let data_path   = &base_path./northstar-bank-alg/data;
-%let output_path = &base_path./northstar-bank-alg/output;
-%let campaign_id = NS_ALG_BIZ_XSELL_2024Q3;
-%let run_date    = %sysfunc(today(), yymmddn8.);
+/* ── CAMPAIGN PARAMETERS ─────────────────────────────────────────────── */
+%include "&base_path./northstar-campaign-engine Program 00_campaign_config.sas";
 
 libname alg clear;
 libname alg "&data_path.";
