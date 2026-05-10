@@ -208,25 +208,25 @@ options mlogic symbolgen mprint;
 
 proc freq data=alg.sbo_enrichment;
   tables sbo_signal_source * sbo_confidence / nocum norow nocol;
-  title "%nrstr(A&LG): SBO Signal Source x Confidence Tier";
+  title 'A&LG: SBO Signal Source x Confidence Tier';
 run;
 
 /* AEP propensity score distribution */
 proc means data=alg.aep_audience_export n mean std min max;
   var aep_propensity_score;
-  title "%nrstr(A&LG): Adobe AEP Propensity Score Distribution (SBO Segment)";
+  title 'A&LG: Adobe AEP Propensity Score Distribution (SBO Segment)';
 run;
 
 /* Language preference — bilingual campaign planning */
 proc freq data=alg.crm_customers;
   tables preferred_language / nocum;
-  title "%nrstr(A&LG): Customer Language Preference (EN/ES Split)";
+  title 'A&LG: Customer Language Preference (EN/ES Split)';
 run;
 
 /* Suppression breakdown */
 proc freq data=alg.alg_suppressions;
   tables suppress_type suppress_channel / nocum;
-  title "%nrstr(A&LG): Suppression File — Type and Channel Breakdown";
+  title 'A&LG: Suppression File — Type and Channel Breakdown';
 run;
 
 /* Age distribution — target band coverage */
@@ -238,12 +238,12 @@ run;
 
 proc means data=work.age_profile n mean std min max;
   var age;
-  title "%nrstr(A&LG): CRM Base Age Distribution";
+  title 'A&LG: CRM Base Age Distribution';
 run;
 
 proc freq data=work.age_profile;
   tables in_target_band / nocum;
-  title "%nrstr(A&LG): Target Age Band (35-60) Coverage";
+  title 'A&LG: Target Age Band (35-60) Coverage';
 run;
 
 title;

@@ -48,7 +48,7 @@ data work.s1_age;
   age = year(today()) - birth_year;
   if &min_age. <= age <= &max_age.;
 run;
-%let n_s1 = %sysfunc(attrn(%sysfunc(open(work.s1_age)), nobs));
+%let n_s1 = %sysfunc(attrn(%sysfunc(open(work.s1_age)), nobs)); *for waterfall counts too later
 %put NOTE: [WATERFALL S1] Age &min_age.-&max_age. = &n_s1.;
 
 
@@ -60,7 +60,7 @@ proc sql;
       from work.s1_age c
       inner join alg.sbo_enrichment s on c.customer_id = s.customer_id;
 quit;
-%let n_s2 = %sysfunc(attrn(%sysfunc(open(work.s2_sbo)), nobs));
+%let n_s2 = %sysfunc(attrn(%sysfunc(open(work.s2_sbo)), nobs)); *for waterfall counts too later
 %put NOTE: [WATERFALL S2] + SBO signal = &n_s2.;
 
 
@@ -75,7 +75,7 @@ proc sql;
       left join alg.core_biz_accounts b on c.customer_id = b.customer_id
       where b.customer_id is null;
 quit;
-%let n_s3 = %sysfunc(attrn(%sysfunc(open(work.s3_no_biz)), nobs));
+%let n_s3 = %sysfunc(attrn(%sysfunc(open(work.s3_no_biz)), nobs)); *for waterfall counts too later
 %put NOTE: [WATERFALL S3] - Existing biz account = &n_s3.;
 
 
@@ -88,7 +88,7 @@ proc sql;
       left join alg.alg_suppressions s on c.customer_id = s.customer_id
       where s.customer_id is null;
 quit;
-%let n_s4 = %sysfunc(attrn(%sysfunc(open(work.s4_clean)), nobs));
+%let n_s4 = %sysfunc(attrn(%sysfunc(open(work.s4_clean)), nobs)); *for waterfall counts too later
 %put NOTE: [WATERFALL S4] - Suppressed = &n_s4.;
 
 
@@ -102,7 +102,7 @@ proc sql;
       where r.customer_id is null
          or r.last_contact_dt < (today() - &contact_lag.);
 quit;
-%let n_s5 = %sysfunc(attrn(%sysfunc(open(work.s5_lag)), nobs));
+%let n_s5 = %sysfunc(attrn(%sysfunc(open(work.s5_lag)), nobs)); *for waterfall counts too later
 %put NOTE: [WATERFALL S5] - Contact lag (&contact_lag.d) = &n_s5.;
 
 
@@ -111,7 +111,7 @@ proc datasets lib=work nodetails nofs nolist; delete s6_dedup; quit;
 proc sort data=work.s5_lag out=work.s6_dedup nodupkey;
   by customer_id;
 run;
-%let n_s6 = %sysfunc(attrn(%sysfunc(open(work.s6_dedup)), nobs));
+%let n_s6 = %sysfunc(attrn(%sysfunc(open(work.s6_dedup)), nobs)); *for waterfall counts too later
 %put NOTE: [WATERFALL S6] Dedup = &n_s6.;
 
 
@@ -131,7 +131,7 @@ proc sql;
       from work.s6_dedup u
       left join alg.aep_audience_export a on u.customer_id = a.customer_id;
 quit;
-%let n_s7 = %sysfunc(attrn(%sysfunc(open(work.s7_enriched)), nobs));
+%let n_s7 = %sysfunc(attrn(%sysfunc(open(work.s7_enriched)), nobs)); *for waterfall counts too later
 %put NOTE: [WATERFALL S7] AEP enrichment complete = &n_s7.;
 
 /* Count AEP coverage */
@@ -153,7 +153,7 @@ data alg.lead_universe;
   audience_segment_id  = "&audience_seg.";
   selection_dt         = today();
   label
-    alg_stage           = "%nrstr(A&LG) Lifecycle Stage"
+    alg_stage           = 'A&LG Lifecycle Stage'
     audience_segment_id = "Upstream Audience Segment ID"
     score_source        = "Propensity Score Source (AEP or Internal)";
 run;
@@ -172,7 +172,7 @@ proc sql;
       count(*), count(*)/input("&n_s2.", best12.)*100 from work.s3_no_biz
     union all select 5, 'S4: - Suppressed (all channels)',
       count(*), count(*)/input("&n_s3.", best12.)*100 from work.s4_clean
-    union all select 6, 'S5: - Contact lag (&contact_lag. days)',
+    union all select 6, "S5: - Contact lag (&contact_lag. days)",
       count(*), count(*)/input("&n_s4.", best12.)*100 from work.s5_lag
     union all select 7, 'S6: Dedup on customer_id',
       count(*), count(*)/input("&n_s5.", best12.)*100 from work.s6_dedup
@@ -184,10 +184,10 @@ quit;
 proc print data=work.alg_waterfall noobs label;
   var step records pct_prior;
   format pct_prior 8.1;
-  label step      = "%nrstr(A&LG) Selection Stage"
+  label step      = 'A&LG Selection Stage'
         records   = "Lead Count"
         pct_prior = "% of Prior Stage";
-  title "NS_ALG_BIZ_XSELL_2024Q3 — %nrstr(A&LG) Lead Selection Waterfall";
+  title 'NS_ALG_BIZ_XSELL_2024Q3 — A&LG Lead Selection Waterfall';
   title2 "Deliver to Business Banking Marketing for sign-off prior to QC";
 run;
 
