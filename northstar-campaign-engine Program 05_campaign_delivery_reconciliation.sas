@@ -35,6 +35,7 @@ dm 'log;clear;output;clear;';
 options mprint mlogic symbolgen source2;
 
 /* ── CAMPAIGN PARAMETERS ─────────────────────────────────────────────── */
+%let base_path    = /home/u1557222/northstar_campaign_engine;
 %include "&base_path./northstar-campaign-engine Program 00_campaign_config.sas";
 
 libname alg clear;
