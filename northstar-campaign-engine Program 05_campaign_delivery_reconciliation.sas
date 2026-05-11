@@ -40,7 +40,8 @@ options mprint mlogic symbolgen source2;
 
 libname alg clear;
 libname alg "&data_path.";
-
+libname output clear;
+libname output "&output_path.";
 
 /* ── STEP 1: RETRIEVE QC-APPROVED UNIVERSE COUNT ─────────────────────── */
 /* This is the "gold" count — the number that cleared QC in Program 03.
@@ -56,37 +57,11 @@ quit;
 
 /* ── STEP 2: REBUILD CHANNEL ASSIGNMENT COUNTS FROM DEPLOYED DATA ──────  */
 /* Re-derive channel assignment to count expected records per output file.
-   In production this would read from a persisted campaign_deployed table
-   saved during Program 04.                                               */
-
-data work.deployed_recon;
-  set alg.lead_universe;
-  call streaminit(2024);
-
-  /* Replicate same scoring/channel logic as Program 04 */
-  base_score = rand('normal', 48, 14) + (sbo_confidence='HIGH')*8;
-  if score_source='AEP' and aep_propensity_score > . then
-    final_score = aep_propensity_score;
-  else
-    final_score = max(1, min(99, round(base_score)));
-
-  length score_tier $10 channel $15;
-  if      final_score >= 70 then score_tier = 'HIGH';
-  else if final_score >= 40 then score_tier = 'MEDIUM';
-  else                           score_tier = 'LOW';
-
-  if email ne '' and index(email,'@') > 0         then channel = 'EMAIL';
-  else if phone ne '' and score_tier in ('HIGH','MEDIUM') then channel = 'OUTBOUND_CALL';
-  else                                                         channel = 'DIRECT_MAIL';
-
-  drop base_score final_score score_tier;
-run;
-
 /* Expected count per channel */
 proc sql noprint;
-  select sum(channel='EMAIL')         into :expected_email from work.deployed_recon;
-  select sum(channel='OUTBOUND_CALL') into :expected_call  from work.deployed_recon;
-  select sum(channel='DIRECT_MAIL')   into :expected_mail  from work.deployed_recon;
+  select sum(channel='EMAIL')         into :expected_email from output.deployed;
+  select sum(channel='OUTBOUND_CALL') into :expected_call  from output.deployed;
+  select sum(channel='DIRECT_MAIL')   into :expected_mail  from output.deployed;
 quit;
 
 %let expected_total = %eval(&expected_email. + &expected_call. + &expected_mail.);
@@ -105,16 +80,20 @@ quit;
     %put NOTE: [RECON PASS] &label. — count confirmed: &actual.;
 %mend recon_check;
 
-/* In production, actual counts would be read from the exported CSV files:
+/* Read from the exported CSV files:*/
    proc import datafile="&output_path./&campaign_id._EMAIL_&run_date..csv"
      out=work.check_email dbms=csv replace; run;
    %let actual_email = %sysfunc(attrn(%sysfunc(open(work.check_email)),nobs));
-   For this demo, actuals = expected (simulating clean delivery).         */
-
-%let actual_email = &expected_email.;
-%let actual_call  = &expected_call.;
-%let actual_mail  = &expected_mail.;
-%let actual_total = &expected_total.;
+   %if &actual_email = . %then %let actual_email = 0;
+   proc import datafile="&output_path./&campaign_id._CALL_&run_date..csv"
+     out=work.check_call dbms=csv replace; run;
+   %let actual_call  = %sysfunc(attrn(%sysfunc(open(work.check_call)),nobs));
+   %if &actual_call = . %then %let actual_call = 0;
+   proc import datafile="&output_path./&campaign_id._MAIL_&run_date..csv"
+     out=work.check_mail dbms=csv replace; run;
+   %let actual_mail  = %sysfunc(attrn(%sysfunc(open(work.check_mail)),nobs));
+   %if &actual_mail = . %then %let actual_mail = 0;
+   %let actual_total = %eval(&actual_email + &actual_call + &actual_mail);
 
 %recon_check(label=EMAIL file record count,    actual=&actual_email., expected=&expected_email.);
 %recon_check(label=OUTBOUND_CALL file count,   actual=&actual_call.,  expected=&expected_call.);
