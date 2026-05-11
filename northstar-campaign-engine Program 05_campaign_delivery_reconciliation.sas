@@ -84,15 +84,15 @@ quit;
    proc import datafile="&output_path./&campaign_id._EMAIL_&run_date..csv"
      out=work.check_email dbms=csv replace; run;
    %let actual_email = %sysfunc(attrn(%sysfunc(open(work.check_email)),nobs));
-   %if &actual_email = . %then %let actual_email = 0;
+   %if &actual_email = . %then %do; %let actual_email = 0; %end;
    proc import datafile="&output_path./&campaign_id._CALL_&run_date..csv"
      out=work.check_call dbms=csv replace; run;
    %let actual_call  = %sysfunc(attrn(%sysfunc(open(work.check_call)),nobs));
-   %if &actual_call = . %then %let actual_call = 0;
+   %if &actual_call = . %then %do; %let actual_call = 0; %end;
    proc import datafile="&output_path./&campaign_id._MAIL_&run_date..csv"
      out=work.check_mail dbms=csv replace; run;
    %let actual_mail  = %sysfunc(attrn(%sysfunc(open(work.check_mail)),nobs));
-   %if &actual_mail = . %then %let actual_mail = 0;
+   %if &actual_mail = . %then %do; %let actual_mail = 0; %end;
    %let actual_total = %eval(&actual_email + &actual_call + &actual_mail);
 
 %recon_check(label=EMAIL file record count,    actual=&actual_email., expected=&expected_email.);
@@ -105,27 +105,46 @@ quit;
 /* This table is the primary stakeholder deliverable — marketing sign-off
    confirms they received the correct file counts before deployment.      */
 
-proc sql;
-  create table work.delivery_summary as
-    select 'EMAIL'         as channel length=15,
-           &actual_email.  as records_delivered,
-           &expected_email. as records_expected,
-           case when &actual_email. = &expected_email. then 'CONFIRMED'
-                else 'MISMATCH — REVIEW' end as reconciliation_status length=25,
-           cats("&campaign_id._EMAIL_&run_date..csv") as output_filename length=60
-    union all
-    select 'OUTBOUND_CALL', &actual_call.,  &expected_call.,
-           case when &actual_call.  = &expected_call.  then 'CONFIRMED' else 'MISMATCH — REVIEW' end,
-           cats("&campaign_id._CALL_&run_date..csv")
-    union all
-    select 'DIRECT_MAIL',  &actual_mail.,  &expected_mail.,
-           case when &actual_mail.  = &expected_mail.  then 'CONFIRMED' else 'MISMATCH — REVIEW' end,
-           cats("&campaign_id._MAIL_&run_date..csv")
-    union all
-    select '— TOTAL —',   &actual_total., &approved_universe_n.,
-           case when &actual_total. = &approved_universe_n. then 'CONFIRMED' else 'MISMATCH — REVIEW' end,
-           '(all files)';
-quit;
+data work.delivery_summary;
+    length channel $15 reconciliation_status $25 output_filename $60;
+
+    /* EMAIL row */
+    channel = 'EMAIL';
+    records_delivered = &actual_email.;
+    records_expected  = &expected_email.;
+    if records_delivered = records_expected then reconciliation_status = 'CONFIRMED';
+    else reconciliation_status = 'MISMATCH — REVIEW';
+    output_filename = cats("&campaign_id._EMAIL_&run_date..csv");
+    output;
+
+    /* OUTBOUND CALL row */
+    channel = 'OUTBOUND_CALL';
+    records_delivered = &actual_call.;
+    records_expected  = &expected_call.;
+    if records_delivered = records_expected then reconciliation_status = 'CONFIRMED';
+    else reconciliation_status = 'MISMATCH — REVIEW';
+    output_filename = cats("&campaign_id._CALL_&run_date..csv");
+    output;
+
+    /* DIRECT MAIL row */
+    channel = 'DIRECT_MAIL';
+    records_delivered = &actual_mail.;
+    records_expected  = &expected_mail.;
+    if records_delivered = records_expected then reconciliation_status = 'CONFIRMED';
+    else reconciliation_status = 'MISMATCH — REVIEW';
+    output_filename = cats("&campaign_id._MAIL_&run_date..csv");
+    output;
+
+    /* TOTAL row */
+    channel = '— TOTAL —';
+    records_delivered = &actual_total.;
+    records_expected  = &approved_universe_n.;
+    if records_delivered = records_expected then reconciliation_status = 'CONFIRMED';
+    else reconciliation_status = 'MISMATCH — REVIEW';
+    output_filename = '(all files)';
+    output;
+run;
+
 
 proc print data=work.delivery_summary noobs label;
   var channel records_delivered records_expected reconciliation_status output_filename;
@@ -134,7 +153,7 @@ proc print data=work.delivery_summary noobs label;
         records_expected      = "Expected"
         reconciliation_status = "Status"
         output_filename       = "Output File";
-  title "%nrstr(A&LG) Campaign Delivery Reconciliation — &campaign_id.";
+  title 'A&LG Campaign Delivery Reconciliation — &campaign_id.';
   title2 "Deliver to: &campaign_owner. | Prepared by: &delivery_analyst.";
 run;
 
@@ -164,18 +183,18 @@ run;
 proc print data=work.campaign_log_entry noobs label;
   label campaign_id           = "Campaign"
         delivery_dt           = "Delivery Date"
-        alg_stage             = "%nrstr(A&LG) Stage"
+        alg_stage             = 'A&LG Stage'
         email_n               = "Email"
         call_n                = "Call"
         mail_n                = "Mail"
         total_n               = "Total"
         reconciliation_status = "Recon Status";
-  title "A&LG Campaign Metadata — Log Entry for Workfront / Campaign Tracker";
+  title 'A&LG Campaign Metadata — Log Entry for Workfront / Campaign Tracker';
 run;
 
 title; title2;
 
-
+options nomprint nomlogic nosymbolgen;
 /* ── STEP 6: DELIVERY CONFIRMATION BANNER ────────────────────────────── */
 %put NOTE: ══════════════════════════════════════════════════════════════;
 %put NOTE:  %nrstr(A&LG) DELIVERY CONFIRMATION — &campaign_id.;
