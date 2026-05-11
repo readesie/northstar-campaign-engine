@@ -153,7 +153,7 @@ proc print data=work.delivery_summary noobs label;
         records_expected      = "Expected"
         reconciliation_status = "Status"
         output_filename       = "Output File";
-  title 'A&LG Campaign Delivery Reconciliation — &campaign_id.';
+  title "%nrstr(A&LG) Campaign Delivery Reconciliation — &campaign_id.";
   title2 "Deliver to: &campaign_owner. | Prepared by: &delivery_analyst.";
 run;
 
