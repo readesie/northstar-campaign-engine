@@ -70,7 +70,7 @@ run;
 
 
 /* ── STEP 2: CHANNEL ASSIGNMENT ──────────────────────────────────────── */
-data work.deployed;
+data alg.deployed;
   set work.scored;
   length channel $15 channel_reason $60;
 
@@ -92,19 +92,19 @@ data work.deployed;
         channel_reason = "Channel Assignment Rationale";
 run;
 
-proc freq data=work.deployed;
+proc freq data=alg.deployed;
   tables channel / nocum;
   title "%nrstr(A&LG) Channel Assignment Distribution";
 run;
 
 /* Score source breakdown by channel */
-proc freq data=work.deployed;
+proc freq data=alg.deployed;
   tables channel * score_source / nocum norow nopct;
   title "AEP vs. Internal Score Coverage by Channel";
 run;
 
 /* Language split by channel — for bilingual creative routing */
-proc freq data=work.deployed;
+proc freq data=alg.deployed;
   tables channel * preferred_language / nocum norow nopct;
   title "EN/ES Language Split by Channel";
 run;
@@ -116,7 +116,7 @@ title;
 
 /* EMAIL — to ESP / Adobe Journey Optimizer batch feed */
 data work.out_email;
-  set work.deployed (where=(channel='EMAIL'));
+  set alg.deployed (where=(channel='EMAIL'));
   keep campaign_id customer_id first_name last_name email
        final_score score_tier score_source preferred_language
        sbo_confidence state selection_dt;
@@ -135,7 +135,7 @@ run;
 
 /* OUTBOUND CALL — to predictive dialer, formatted phone */
 data work.out_call;
-  set work.deployed (where=(channel='OUTBOUND_CALL'));
+  set alg.deployed (where=(channel='OUTBOUND_CALL'));
   phone_fmt = cats('(', substr(phone,1,3), ') ',
                     substr(phone,4,3), '-', substr(phone,7,4));
   keep campaign_id customer_id first_name last_name phone_fmt
@@ -156,7 +156,7 @@ run;
 
 /* DIRECT MAIL — to mail house vendor */
 data work.out_mail;
-  set work.deployed (where=(channel='DIRECT_MAIL'));
+  set alg.deployed (where=(channel='DIRECT_MAIL'));
   call streaminit(303);
   length address1 $50 city $20 zip $5;
   address1 = cats(floor(rand('uniform')*8999)+1001, ' Commerce Dr');
@@ -186,7 +186,7 @@ proc sql;
            sum(score_tier='HIGH')     as high_n         label="High Tier",
            sum(score_tier='MEDIUM')   as med_n          label="Med Tier",
            sum(score_tier='LOW')      as low_n          label="Low Tier"
-      from work.deployed
+      from alg.deployed
       group by channel
       order by avg_score desc;
 quit;
